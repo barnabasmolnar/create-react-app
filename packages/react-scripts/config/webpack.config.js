@@ -38,6 +38,15 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 // @remove-on-eject-end
 const postcssNormalize = require('postcss-normalize');
+const postcssLoadConfig = require('postcss-load-config');
+
+const hasPostcssConfig = (() => {
+  try {
+    return !!postcssLoadConfig.sync();
+  } catch (_error) {
+    return false;
+  }
+})();
 
 const appPackageJson = require(paths.appPackageJson);
 
@@ -106,6 +115,30 @@ module.exports = function (webpackEnv) {
 
   const shouldUseReactRefresh = env.raw.FAST_REFRESH;
 
+  // postcss config options
+  const customPostcssOptions = {
+    sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
+  };
+
+  const defaultPostcssOptions = {
+    ...customPostcssOptions,
+    postcssOptions: {
+      plugins: () => [
+        require('postcss-flexbugs-fixes'),
+        require('postcss-preset-env')({
+          autoprefixer: {
+            flexbox: 'no-2009',
+          },
+          stage: 3,
+        }),
+        // Adds PostCSS Normalize as the reset css with default options,
+        // so that it honors browserslist config in package.json
+        // which in turn let's users customize the target behavior as per their needs.
+        postcssNormalize(),
+      ],
+    },
+  };
+
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
     const loaders = [
@@ -127,25 +160,10 @@ module.exports = function (webpackEnv) {
         // Adds vendor prefixing based on your specified browser support in
         // package.json
         loader: require.resolve('postcss-loader'),
-        options: {
-          // Necessary for external CSS imports to work
-          // https://github.com/facebook/create-react-app/issues/2677
-          ident: 'postcss',
-          plugins: () => [
-            require('postcss-flexbugs-fixes'),
-            require('postcss-preset-env')({
-              autoprefixer: {
-                flexbox: 'no-2009',
-              },
-              stage: 3,
-            }),
-            // Adds PostCSS Normalize as the reset css with default options,
-            // so that it honors browserslist config in package.json
-            // which in turn let's users customize the target behavior as per their needs.
-            postcssNormalize(),
-          ],
-          sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
-        },
+        ident: 'postcss',
+        options: hasPostcssConfig
+          ? customPostcssOptions
+          : defaultPostcssOptions,
       },
     ].filter(Boolean);
     if (preProcessor) {

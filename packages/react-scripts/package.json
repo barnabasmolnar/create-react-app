@@ -1,10 +1,10 @@
 {
-  "name": "react-scripts",
-  "version": "4.0.3",
-  "description": "Configuration and scripts for Create React App.",
+  "name": "@barnabasmolnar/react-scripts",
+  "version": "1.0.0",
+  "description": "Configuration and scripts for Create React App with support for custom PostCSS configs.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/facebook/create-react-app.git",
+    "url": "https://github.com/barnabasmolnar/create-react-app.git",
     "directory": "packages/react-scripts"
   },
   "license": "MIT",
@@ -67,6 +67,7 @@
     "pnp-webpack-plugin": "1.6.4",
     "postcss": "^8.3.5",
     "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-load-config": "^3.1.0",
     "postcss-loader": "^4.3.0",
     "postcss-normalize": "^10.0.0",
     "postcss-preset-env": "6.7.0",
